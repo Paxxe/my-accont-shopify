@@ -1,0 +1,66 @@
+{% if customer %}
+{% assign fav_products = customer.metafields.custom.favourites_prod.value %}
+{% assign fav_handles = fav_products | map: 'handle' %}
+
+<style>
+  .wishlist { cursor: pointer; transition: transform 0.15s, opacity 0.15s; }
+  .wishlist.wishlisted { color: #e53935; }
+  .wishlist.wishlist-loading { opacity: 0.4; pointer-events: none; }
+  .wishlist:active { transform: scale(0.88); }
+</style>
+
+<script>
+(function () {
+  var customerId = '{{ customer.id }}';
+  var PROXY = '/apps/my-account';
+  var wishlist = {{ fav_handles | json }} || [];
+
+  function syncButtons() {
+    document.querySelectorAll('.wishlist[data-wish]').forEach(function (btn) {
+      var active = wishlist.indexOf(btn.dataset.wish) !== -1;
+      btn.classList.toggle('wishlisted', active);
+      btn.setAttribute('aria-pressed', String(active));
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', syncButtons);
+  syncButtons();
+
+  document.addEventListener('click', async function (e) {
+    var btn = e.target.closest('.wishlist[data-wish]');
+    if (!btn || btn.disabled) return;
+    e.preventDefault();
+    var handle = btn.dataset.wish;
+    btn.disabled = true;
+    btn.classList.add('wishlist-loading');
+    try {
+      var r = await fetch(PROXY + '?action=toggle-wishlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ customerId: customerId, handle: handle }),
+      });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      var data = await r.json();
+      if (data.added) {
+        wishlist.push(handle);
+      } else {
+        wishlist = wishlist.filter(function (h) { return h !== handle; });
+      }
+      syncButtons();
+    } catch (err) {
+      console.error('[wishlist] toggle error', err);
+    }
+    btn.disabled = false;
+    btn.classList.remove('wishlist-loading');
+  });
+})();
+</script>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Wishlist Toggle",
+  "target": "body",
+  "settings": []
+}
+{% endschema %}

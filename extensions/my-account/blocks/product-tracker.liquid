@@ -1,0 +1,37 @@
+{% if block.settings.enable_tracking %}
+  {% if product %}
+  <script>
+    (function () {
+      try {
+        var p = {
+          id: '{{ product.id }}',
+          title: {{ product.title | json }},
+          url: '{{ product.url }}',
+          image: {% if product.featured_image %}'{{ product.featured_image | image_url: width: 400 }}'{% else %}null{% endif %},
+          price: '{{ product.price_min | money }}'
+        };
+        var key = 'ma_rv';
+        var list = JSON.parse(localStorage.getItem(key) || '[]');
+        list = list.filter(function (x) { return x.id !== p.id; });
+        list.unshift(p);
+        localStorage.setItem(key, JSON.stringify(list.slice(0, 20)));
+      } catch (e) {}
+    })();
+  </script>
+  {% endif %}
+{% endif %}
+
+{% schema %}
+{
+  "name": "Product Tracker",
+  "target": "body",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "enable_tracking",
+      "label": "Abilita tracking prodotti visitati",
+      "default": true
+    }
+  ]
+}
+{% endschema %}

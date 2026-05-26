@@ -1,0 +1,98 @@
+{
+  "ratings": {
+    "stars": {
+      "label": "Ratings"
+    },
+    "home": {
+      "recommendationText": "Recommended Product!"
+    }
+  },
+  "my_account": {
+    "loading": "Loading...",
+    "error_loading": "Error loading data.",
+    "tab_profile": "My Profile",
+    "tab_addresses": "Addresses",
+    "tab_marketing": "Marketing",
+    "tab_orders": "Orders",
+    "tab_logout": "Logout",
+    "tab_wishlist": "Wishlist",
+    "wishlist": {
+      "empty": "No saved products.",
+      "loading": "Loading...",
+      "error": "Error loading wishlist."
+    },
+    "profile": {
+      "first_name": "First Name",
+      "last_name": "Last Name",
+      "email": "Email",
+      "email_readonly": "(not editable)",
+      "phone": "Phone",
+      "birthdate": "Date of Birth",
+      "save": "Save Profile",
+      "success": "Profile updated!",
+      "error": "Error saving."
+    },
+    "addresses": {
+      "empty": "No saved addresses.",
+      "add": "+ Add Address",
+      "success": "Address saved!",
+      "error": "Error saving.",
+      "is_default": "✓ Default Address",
+      "set_default": "Set as Default",
+      "default_success": "Updated!",
+      "default_error": "Error.",
+      "form_first_name": "First Name",
+      "form_last_name": "Last Name",
+      "form_address1": "Street and number *",
+      "form_address2": "Apartment, suite (optional)",
+      "form_zip": "ZIP *",
+      "form_city": "City *",
+      "form_province": "Province",
+      "form_country": "Country *",
+      "form_phone": "Phone (optional)",
+      "other": "Other Addresses",
+      "form_save": "Save Address",
+      "delete": "Delete",
+      "delete_confirm": "Delete this address?",
+      "delete_success": "Address deleted.",
+      "delete_error": "Error deleting."
+    },
+    "marketing": {
+      "consents_heading": "Consents",
+      "email_consent": "I agree to receive marketing emails",
+      "sms_consent": "I agree to receive marketing SMS",
+      "sms_no_phone": "Add a phone number to your profile to manage SMS consent.",
+      "save_consents": "Save Consents",
+      "consents_success": "Consents updated!",
+      "prefs_heading": "Preferences",
+      "save_prefs": "Save Preferences",
+      "prefs_success": "Preferences updated!",
+      "error": "Error saving."
+    },
+    "orders": {
+      "empty": "No orders found.",
+      "detail_btn": "Details",
+      "loading": "Loading...",
+      "error_detail": "Error loading order details.",
+      "back": "← Back to orders",
+      "tracking": "Tracking",
+      "products": "Products",
+      "qty": "Qty:",
+      "subtotal": "Subtotal",
+      "shipping": "Shipping",
+      "total": "Total",
+      "shipping_address": "Shipping Address"
+    },
+    "loyalty": {
+      "heading": "Loyalty Program",
+      "unlocked_title": "Discount Unlocked!",
+      "unlocked_desc": "You've completed your orders. Use the code:",
+      "unlocked_footnote": "10% off your next order",
+      "progress_title": "Climb the ranks!",
+      "progress_remaining": "Just {n} more {unit} to unlock",
+      "order_one": "order",
+      "order_other": "orders",
+      "progress_footnote": "10% off your next purchase."
+    }
+  }
+}

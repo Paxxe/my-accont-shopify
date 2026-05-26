@@ -1,0 +1,55 @@
+{% if customer %}
+<div id="ma-rv-root" style="display:none;">
+  <h2 class="ma-rv-title">{{ block.settings.title }}</h2>
+  <div id="ma-rv-grid" class="ma-rv-grid"></div>
+</div>
+
+<style>
+  .ma-rv-title { font-size: 18px; font-weight: 700; margin: 0 0 16px; }
+  .ma-rv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px; }
+  .ma-rv-card { display: block; text-decoration: none; color: inherit; border: 1px solid #e5e5e5; border-radius: 6px; overflow: hidden; transition: box-shadow 0.2s; }
+  .ma-rv-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+  .ma-rv-card img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; background: #f5f5f5; }
+  .ma-rv-card-no-img { width: 100%; aspect-ratio: 1; background: #f5f5f5; display: block; }
+  .ma-rv-card-body { padding: 10px 12px; }
+  .ma-rv-card-title { font-size: 13px; font-weight: 500; margin: 0 0 4px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .ma-rv-card-price { font-size: 13px; color: #555; margin: 0; }
+</style>
+
+<script>
+(function () {
+  var root = document.getElementById('ma-rv-root');
+  var grid = document.getElementById('ma-rv-grid');
+  var list = [];
+  try { list = JSON.parse(localStorage.getItem('ma_rv') || '[]').slice(0, 6); } catch (e) {}
+  if (list.length === 0) return;
+  root.style.display = 'block';
+  grid.innerHTML = list.map(function (p) {
+    return '<a href="' + p.url + '" class="ma-rv-card">' +
+      (p.image
+        ? '<img src="' + p.image + '" alt="' + p.title + '">'
+        : '<div class="ma-rv-card-no-img"></div>') +
+      '<div class="ma-rv-card-body">' +
+        '<p class="ma-rv-card-title">' + p.title + '</p>' +
+        '<p class="ma-rv-card-price">' + p.price + '</p>' +
+      '</div>' +
+    '</a>';
+  }).join('');
+})();
+</script>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Prodotti visti di recente",
+  "target": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Titolo sezione",
+      "default": "Visti di recente"
+    }
+  ]
+}
+{% endschema %}

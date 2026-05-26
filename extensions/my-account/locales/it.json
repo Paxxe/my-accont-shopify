@@ -1,0 +1,98 @@
+{
+  "ratings": {
+    "stars": {
+      "label": "Valutazioni"
+    },
+    "home": {
+      "recommendationText": "Prodotto consigliato!"
+    }
+  },
+  "my_account": {
+    "loading": "Caricamento...",
+    "error_loading": "Errore nel caricamento dei dati.",
+    "tab_profile": "Il mio profilo",
+    "tab_addresses": "Indirizzi",
+    "tab_marketing": "Marketing",
+    "tab_orders": "Ordini",
+    "tab_logout": "Esci",
+    "tab_wishlist": "Wishlist",
+    "wishlist": {
+      "empty": "Nessun prodotto salvato.",
+      "loading": "Caricamento...",
+      "error": "Errore nel caricamento della wishlist."
+    },
+    "profile": {
+      "first_name": "Nome",
+      "last_name": "Cognome",
+      "email": "Email",
+      "email_readonly": "(non modificabile)",
+      "phone": "Telefono",
+      "birthdate": "Data di nascita",
+      "save": "Salva profilo",
+      "success": "Profilo aggiornato!",
+      "error": "Errore nel salvataggio."
+    },
+    "addresses": {
+      "empty": "Nessun indirizzo salvato.",
+      "add": "+ Aggiungi indirizzo",
+      "success": "Indirizzo salvato!",
+      "error": "Errore nel salvataggio.",
+      "is_default": "✓ Indirizzo principale",
+      "set_default": "Imposta come principale",
+      "default_success": "Aggiornato!",
+      "default_error": "Errore.",
+      "form_first_name": "Nome",
+      "form_last_name": "Cognome",
+      "form_address1": "Via e numero civico *",
+      "form_address2": "Interno, scala (opzionale)",
+      "form_zip": "CAP *",
+      "form_city": "Città *",
+      "form_province": "Provincia",
+      "form_country": "Paese *",
+      "form_phone": "Telefono (opzionale)",
+      "other": "Altri indirizzi",
+      "form_save": "Salva indirizzo",
+      "delete": "Elimina",
+      "delete_confirm": "Eliminare questo indirizzo?",
+      "delete_success": "Indirizzo eliminato.",
+      "delete_error": "Errore nell'eliminazione."
+    },
+    "marketing": {
+      "consents_heading": "Consensi",
+      "email_consent": "Accetto di ricevere email di marketing",
+      "sms_consent": "Accetto di ricevere SMS di marketing",
+      "sms_no_phone": "Aggiungi un numero di telefono al profilo per gestire il consenso SMS.",
+      "save_consents": "Salva consensi",
+      "consents_success": "Consensi aggiornati!",
+      "prefs_heading": "Preferenze",
+      "save_prefs": "Salva preferenze",
+      "prefs_success": "Preferenze aggiornate!",
+      "error": "Errore nel salvataggio."
+    },
+    "orders": {
+      "empty": "Nessun ordine trovato.",
+      "detail_btn": "Dettaglio",
+      "loading": "Caricamento...",
+      "error_detail": "Errore nel caricamento del dettaglio.",
+      "back": "← Torna agli ordini",
+      "tracking": "Tracking",
+      "products": "Prodotti",
+      "qty": "Qtà:",
+      "subtotal": "Subtotale",
+      "shipping": "Spedizione",
+      "total": "Totale",
+      "shipping_address": "Indirizzo di spedizione"
+    },
+    "loyalty": {
+      "heading": "Programma fedeltà",
+      "unlocked_title": "Sconto sbloccato!",
+      "unlocked_desc": "Hai completato gli ordini. Usa il codice:",
+      "unlocked_footnote": "10% di sconto sul prossimo ordine",
+      "progress_title": "Scala la classifica!",
+      "progress_remaining": "Ancora {n} {unit} per sbloccare",
+      "order_one": "ordine",
+      "order_other": "ordini",
+      "progress_footnote": "10% di sconto sul prossimo acquisto."
+    }
+  }
+}

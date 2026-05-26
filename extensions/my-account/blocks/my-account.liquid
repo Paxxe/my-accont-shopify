@@ -1,0 +1,777 @@
+{% if customer %}
+<div id="my-account-app" data-customer-id="{{ customer.id }}" data-customer-email="{{ customer.email }}">
+  <p>{{ 'my_account.loading' | t }}</p>
+</div>
+
+<style>
+  {{ block.settings.body_font | font_face }}
+  #my-account-app {
+    font-family: {{ block.settings.body_font.family }}, {{ block.settings.body_font.fallback_families }};
+    --ma-primary:  {{ block.settings.color_primary }};
+    --ma-accent:   {{ block.settings.color_accent }};
+    --ma-error:    {{ block.settings.color_error }};
+    --ma-radius:   {{ block.settings.border_radius }}px;
+    --ma-max-width: {% if block.settings.full_width %}100%{% else %}{{ block.settings.content_width }}px{% endif %};
+    max-width: var(--ma-max-width);
+    margin: 0 auto;
+  }
+  .ma-tabs { display: flex; gap: 0; border-bottom: 2px solid #e5e5e5; margin-bottom: 24px; align-items: center; }
+  .ma-tab { background: none; border: none; padding: 12px 20px; cursor: pointer; font-size: 14px; font-weight: 500; color: #666; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+  .ma-tab.active { color: var(--ma-primary); border-bottom-color: var(--ma-primary); }
+  .ma-tab-logout { margin-left: auto; margin-bottom: -2px; padding: 8px 14px; font-size: 13px; font-weight: 500; color: var(--ma-error); background: none; border: 1px solid var(--ma-error); border-radius: var(--ma-radius); cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; }
+  .ma-tab-logout:hover { background: var(--ma-error); color: #fff; }
+  .ma-panel { display: none; }
+  .ma-panel.active { display: block; }
+  .ma-field { margin-bottom: 12px; }
+  .ma-field label { display: block; font-size: 12px; font-weight: 600; color: #888; text-transform: uppercase; margin-bottom: 4px; }
+  .ma-field p { margin: 0; font-size: 15px; color: #111; }
+  .ma-profile-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 32px; align-items: start; }
+  @media (max-width: 620px) { .ma-profile-grid { grid-template-columns: 1fr; } }
+  .ma-addr-grid { display: grid; grid-template-columns: 1fr 1.4fr; gap: 20px; margin-bottom: 16px; }
+  @media (max-width: 580px) { .ma-addr-grid { grid-template-columns: 1fr; } }
+  .ma-addr-col-label { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #888; letter-spacing: .05em; margin-bottom: 8px; }
+  .ma-address-card { border: 1px solid #e5e5e5; border-radius: var(--ma-radius); padding: 14px 16px; margin-bottom: 12px; }
+  .ma-address-card:last-child { margin-bottom: 0; }
+  .ma-address-card p { margin: 0 0 2px; font-size: 14px; }
+  .ma-addr-default-card { border-color: var(--ma-primary); background: #fafafa; }
+  .ma-btn-danger { background: transparent; color: var(--ma-error); border: 1px solid var(--ma-error); margin-top: 0; font-size: 12px; padding: 6px 12px; }
+  .ma-btn-danger:hover { background: var(--ma-error); color: #fff; }
+  .ma-wl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 16px; margin-top: 8px; }
+  .ma-wl-card { border: 1px solid #e5e5e5; border-radius: var(--ma-radius); overflow: hidden; text-decoration: none; color: inherit; display: block; }
+  .ma-wl-card img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }
+  .ma-wl-card-body { padding: 10px 12px; }
+  .ma-wl-card-title { font-size: 13px; font-weight: 500; margin: 0 0 4px; }
+  .ma-wl-card-price { font-size: 13px; color: #555; margin: 0; }
+  .ma-btn { display: inline-block; padding: 10px 18px; background: var(--ma-primary); color: #fff; border: none; border-radius: var(--ma-radius); font-size: 14px; cursor: pointer; margin-top: 12px; }
+  .ma-btn-outline { background: transparent; color: var(--ma-primary); border: 1px solid var(--ma-primary); margin-top: 0; }
+  .ma-form { border: 1px solid #e5e5e5; border-radius: var(--ma-radius); padding: 20px; margin-top: 16px; }
+  .ma-form input { width: 100%; box-sizing: border-box; border: 1px solid #ccc; border-radius: calc(var(--ma-radius) - 2px); padding: 8px 10px; font-size: 14px; margin-bottom: 10px; }
+  .ma-form-row { display: flex; gap: 10px; }
+  .ma-form-row input { flex: 1; }
+  .ma-checkbox-group { display: flex; flex-direction: column; gap: 12px; margin-top: 8px; }
+  .ma-checkbox-label { display: flex; align-items: center; gap: 10px; font-size: 15px; cursor: pointer; }
+  .ma-checkbox-label input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+  .ma-input { width: 100%; box-sizing: border-box; border: 1px solid #ccc; border-radius: calc(var(--ma-radius) - 2px); padding: 8px 10px; font-size: 14px; font-family: inherit; }
+  .ma-input:focus { outline: none; border-color: var(--ma-primary); }
+  .ma-success { color: var(--ma-accent); font-size: 13px; margin-top: 8px; display: none; }
+  .ma-error { color: var(--ma-error); font-size: 13px; margin-top: 8px; display: none; }
+  .ma-status-badge { display: inline-block; padding: 3px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; text-transform: uppercase; }
+  .ma-status-green { background: #e8f5e9; color: #2e7d32; }
+  .ma-status-gray { background: #f5f5f5; color: #666; }
+  .ma-status-orange { background: #fff8e1; color: #e65100; }
+  .ma-status-blue { background: #e3f2fd; color: #1565c0; }
+  .ma-order-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid #f0f0f0; gap: 12px; }
+  .ma-order-row:last-child { border-bottom: none; }
+  .ma-order-name { font-weight: 600; font-size: 14px; }
+  .ma-order-date { font-size: 12px; color: #888; margin-top: 2px; }
+  .ma-line-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #f5f5f5; }
+  .ma-line-item:last-child { border-bottom: none; }
+  .ma-line-item img { width: 50px; height: 50px; object-fit: cover; border-radius: calc(var(--ma-radius) - 2px); border: 1px solid #eee; flex-shrink: 0; }
+  .ma-line-item-info { flex: 1; min-width: 0; }
+  .ma-line-item-title { font-size: 13px; font-weight: 500; }
+  .ma-line-item-qty { font-size: 12px; color: #888; margin-top: 2px; }
+  .ma-line-item-price { font-size: 13px; font-weight: 600; white-space: nowrap; }
+  .ma-progress-arc { stroke: var(--ma-primary); animation: ma-arc-fill 1s ease-out forwards; }
+  .ma-progress-arc.ma-arc-unlocked { stroke: var(--ma-accent); }
+  .ma-loyalty-count { color: var(--ma-primary); }
+  .ma-loyalty-count.ma-arc-unlocked { color: var(--ma-accent); }
+  .ma-loyalty-box { border: 1px solid #e5e5e5; border-radius: var(--ma-radius); padding: 16px 20px; margin-top: 20px; }
+  .ma-loyalty-unlocked-box { background: #e8f5e9; border-radius: var(--ma-radius); padding: 10px 14px; }
+  .ma-loyalty-unlocked-code { font-size: 19px; font-weight: 700; letter-spacing: 3px; color: var(--ma-accent); }
+  @keyframes ma-arc-fill { from { stroke-dashoffset: 282.7; } }
+</style>
+
+<script>
+(function () {
+  var MA_T = {
+    loading:                  {{ 'my_account.loading' | t | json }},
+    error_loading:            {{ 'my_account.error_loading' | t | json }},
+    tab_profile:              {{ 'my_account.tab_profile' | t | json }},
+    tab_addresses:            {{ 'my_account.tab_addresses' | t | json }},
+    tab_marketing:            {{ 'my_account.tab_marketing' | t | json }},
+    tab_orders:               {{ 'my_account.tab_orders' | t | json }},
+    tab_logout:               {{ 'my_account.tab_logout' | t | json }},
+    tab_wishlist:             {{ 'my_account.tab_wishlist' | t | json }},
+    wl_empty:                 {{ 'my_account.wishlist.empty' | t | json }},
+    wl_loading:               {{ 'my_account.wishlist.loading' | t | json }},
+    wl_error:                 {{ 'my_account.wishlist.error' | t | json }},
+    profile_first_name:       {{ 'my_account.profile.first_name' | t | json }},
+    profile_last_name:        {{ 'my_account.profile.last_name' | t | json }},
+    profile_email:            {{ 'my_account.profile.email' | t | json }},
+    profile_email_readonly:   {{ 'my_account.profile.email_readonly' | t | json }},
+    profile_phone:            {{ 'my_account.profile.phone' | t | json }},
+    profile_birthdate:        {{ 'my_account.profile.birthdate' | t | json }},
+    profile_save:             {{ 'my_account.profile.save' | t | json }},
+    profile_success:          {{ 'my_account.profile.success' | t | json }},
+    profile_error:            {{ 'my_account.profile.error' | t | json }},
+    addr_empty:               {{ 'my_account.addresses.empty' | t | json }},
+    addr_add:                 {{ 'my_account.addresses.add' | t | json }},
+    addr_success:             {{ 'my_account.addresses.success' | t | json }},
+    addr_error:               {{ 'my_account.addresses.error' | t | json }},
+    addr_is_default:          {{ 'my_account.addresses.is_default' | t | json }},
+    addr_set_default:         {{ 'my_account.addresses.set_default' | t | json }},
+    addr_default_success:     {{ 'my_account.addresses.default_success' | t | json }},
+    addr_default_error:       {{ 'my_account.addresses.default_error' | t | json }},
+    addr_form_first_name:     {{ 'my_account.addresses.form_first_name' | t | json }},
+    addr_form_last_name:      {{ 'my_account.addresses.form_last_name' | t | json }},
+    addr_form_address1:       {{ 'my_account.addresses.form_address1' | t | json }},
+    addr_form_address2:       {{ 'my_account.addresses.form_address2' | t | json }},
+    addr_form_zip:            {{ 'my_account.addresses.form_zip' | t | json }},
+    addr_form_city:           {{ 'my_account.addresses.form_city' | t | json }},
+    addr_form_province:       {{ 'my_account.addresses.form_province' | t | json }},
+    addr_form_country:        {{ 'my_account.addresses.form_country' | t | json }},
+    addr_form_phone:          {{ 'my_account.addresses.form_phone' | t | json }},
+    addr_form_save:           {{ 'my_account.addresses.form_save' | t | json }},
+    addr_other:               {{ 'my_account.addresses.other' | t | json }},
+    addr_delete:              {{ 'my_account.addresses.delete' | t | json }},
+    addr_delete_confirm:      {{ 'my_account.addresses.delete_confirm' | t | json }},
+    addr_delete_success:      {{ 'my_account.addresses.delete_success' | t | json }},
+    addr_delete_error:        {{ 'my_account.addresses.delete_error' | t | json }},
+    mkt_consents:             {{ 'my_account.marketing.consents_heading' | t | json }},
+    mkt_email:                {{ 'my_account.marketing.email_consent' | t | json }},
+    mkt_sms:                  {{ 'my_account.marketing.sms_consent' | t | json }},
+    mkt_sms_no_phone:         {{ 'my_account.marketing.sms_no_phone' | t | json }},
+    mkt_save_consents:        {{ 'my_account.marketing.save_consents' | t | json }},
+    mkt_consents_success:     {{ 'my_account.marketing.consents_success' | t | json }},
+    mkt_prefs:                {{ 'my_account.marketing.prefs_heading' | t | json }},
+    mkt_save_prefs:           {{ 'my_account.marketing.save_prefs' | t | json }},
+    mkt_prefs_success:        {{ 'my_account.marketing.prefs_success' | t | json }},
+    mkt_error:                {{ 'my_account.marketing.error' | t | json }},
+    orders_empty:             {{ 'my_account.orders.empty' | t | json }},
+    orders_detail:            {{ 'my_account.orders.detail_btn' | t | json }},
+    orders_loading:           {{ 'my_account.orders.loading' | t | json }},
+    orders_error:             {{ 'my_account.orders.error_detail' | t | json }},
+    orders_back:              {{ 'my_account.orders.back' | t | json }},
+    orders_tracking:          {{ 'my_account.orders.tracking' | t | json }},
+    orders_products:          {{ 'my_account.orders.products' | t | json }},
+    orders_qty:               {{ 'my_account.orders.qty' | t | json }},
+    orders_subtotal:          {{ 'my_account.orders.subtotal' | t | json }},
+    orders_shipping:          {{ 'my_account.orders.shipping' | t | json }},
+    orders_total:             {{ 'my_account.orders.total' | t | json }},
+    orders_shipping_addr:     {{ 'my_account.orders.shipping_address' | t | json }},
+    loyalty_heading:          {{ 'my_account.loyalty.heading' | t | json }},
+    loyalty_unlocked_title:   {{ 'my_account.loyalty.unlocked_title' | t | json }},
+    loyalty_unlocked_desc:    {{ 'my_account.loyalty.unlocked_desc' | t | json }},
+    loyalty_unlocked_footnote:{{ 'my_account.loyalty.unlocked_footnote' | t | json }},
+    loyalty_progress_title:   {{ 'my_account.loyalty.progress_title' | t | json }},
+    loyalty_progress_remaining: {{ 'my_account.loyalty.progress_remaining' | t | json }},
+    loyalty_order_one:        {{ 'my_account.loyalty.order_one' | t | json }},
+    loyalty_order_other:      {{ 'my_account.loyalty.order_other' | t | json }},
+    loyalty_progress_footnote:{{ 'my_account.loyalty.progress_footnote' | t | json }},
+  };
+
+  const el = document.getElementById('my-account-app');
+  if (!el) return;
+
+  const customerId = el.dataset.customerId;
+  const customerEmail = el.dataset.customerEmail;
+  const PROXY = '/apps/my-account';
+  var CHOICES = ['Man', 'Woman', 'Lifestyle'];
+
+  async function fetchJson(url) {
+    const r = await fetch(url);
+    const text = await r.text();
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return JSON.parse(text);
+  }
+
+  async function postJson(action, data) {
+    const r = await fetch(PROXY + '?action=' + action, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ customerId, ...data }),
+    });
+    const text = await r.text();
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return JSON.parse(text);
+  }
+
+  Promise.all([
+    fetchJson(PROXY + '?action=customer&customerId=' + encodeURIComponent(customerId)),
+    fetchJson(PROXY + '?action=orders&customerId=' + encodeURIComponent(customerId)),
+    fetchJson(PROXY + '?action=settings'),
+  ]).then(function ([cd, od, sd]) {
+    render(cd.customer, od.orders, sd.settings || {});
+  }).catch(function (err) {
+    el.innerHTML = '<p>' + MA_T.error_loading + '</p>';
+    console.error(err);
+  });
+
+  function render(c, orders, settings) {
+    var loyalty = (settings && settings.loyalty) || {};
+    var mktMeta = (settings && settings.metafields && settings.metafields.marketing) || {};
+    CHOICES = mktMeta.choices ? mktMeta.choices.split(',').map(function(s) { return s.trim(); }) : CHOICES;
+    const currentPrefs = c.metafield ? JSON.parse(c.metafield.value) : [];
+
+    el.innerHTML =
+      '<div class="ma-tabs">' +
+        '<button class="ma-tab active" data-tab="profile">' + MA_T.tab_profile + '</button>' +
+        '<button class="ma-tab" data-tab="addresses">' + MA_T.tab_addresses + '</button>' +
+        '<button class="ma-tab" data-tab="marketing">' + MA_T.tab_marketing + '</button>' +
+        '<button class="ma-tab" data-tab="orders">' + MA_T.tab_orders + '</button>' +
+        (settings.metafields && settings.metafields.wishlist && settings.metafields.wishlist.enabled
+          ? '<button class="ma-tab" data-tab="wishlist">' + MA_T.tab_wishlist + '</button>'
+          : '') +
+        '<a href="/account/logout" class="ma-tab-logout">' + MA_T.tab_logout + '</a>' +
+      '</div>' +
+
+      '<div class="ma-panel active" id="ma-profile">' +
+        '<div class="ma-profile-grid">' +
+          '<div>' +
+            '<div class="ma-form-row">' +
+              '<div class="ma-field" style="flex:1"><label>' + MA_T.profile_first_name + '</label><input id="ma-firstName" class="ma-input" value="' + (c.firstName || '') + '"></div>' +
+              '<div class="ma-field" style="flex:1"><label>' + MA_T.profile_last_name + '</label><input id="ma-lastName" class="ma-input" value="' + (c.lastName || '') + '"></div>' +
+            '</div>' +
+            '<div class="ma-field"><label>' + MA_T.profile_email + '</label><p style="margin:0;padding:8px 0;color:#555;font-size:14px;">' + c.email + ' <span style="font-size:11px;color:#aaa;">' + MA_T.profile_email_readonly + '</span></p></div>' +
+            '<div class="ma-field"><label>' + MA_T.profile_phone + '</label><input id="ma-phone" class="ma-input" value="' + (c.phone || '') + '" placeholder="+39 000 0000000"></div>' +
+            '<div class="ma-field"><label>' + MA_T.profile_birthdate + '</label><input id="ma-birthdate" type="date" class="ma-input" value="' + (c.birthdateField ? c.birthdateField.value : '') + '"></div>' +
+            '<button class="ma-btn" id="ma-save-profile">' + MA_T.profile_save + '</button>' +
+            '<p class="ma-success" id="ma-profile-success">' + MA_T.profile_success + '</p>' +
+            '<p class="ma-error" id="ma-profile-error">' + MA_T.profile_error + '</p>' +
+          '</div>' +
+          (loyalty.enabled ? '<div>' + renderLoyaltyProgress(orders, loyalty) + '</div>' : '') +
+        '</div>' +
+      '</div>' +
+
+      '<div class="ma-panel" id="ma-addresses">' +
+        renderAddresses(c.addresses, c.defaultAddress ? c.defaultAddress.id : null) +
+        '<button class="ma-btn ma-btn-outline" id="ma-toggle-form">' + MA_T.addr_add + '</button>' +
+        '<div id="ma-address-form" style="display:none">' + renderAddressForm() + '</div>' +
+        '<p class="ma-success" id="ma-addr-success">' + MA_T.addr_success + '</p>' +
+        '<p class="ma-error" id="ma-addr-error">' + MA_T.addr_error + '</p>' +
+      '</div>' +
+
+      '<div class="ma-panel" id="ma-marketing">' +
+        '<p style="margin:0 0 8px;font-size:13px;font-weight:600;text-transform:uppercase;color:#888;">' + MA_T.mkt_consents + '</p>' +
+        '<div class="ma-checkbox-group" style="margin-bottom:20px;">' +
+          '<label class="ma-checkbox-label">' +
+            '<input type="checkbox" id="ma-email-consent"' + (c.emailMarketingConsent && c.emailMarketingConsent.marketingState === 'SUBSCRIBED' ? ' checked' : '') + '>' +
+            MA_T.mkt_email +
+          '</label>' +
+          (c.phone ?
+          '<label class="ma-checkbox-label">' +
+            '<input type="checkbox" id="ma-sms-consent"' + (c.smsMarketingConsent && c.smsMarketingConsent.marketingState === 'SUBSCRIBED' ? ' checked' : '') + '>' +
+            MA_T.mkt_sms +
+          '</label>'
+        :
+          '<p style="font-size:13px;color:#888;margin:4px 0;">' + MA_T.mkt_sms_no_phone + '</p>'
+        ) +
+        '</div>' +
+        '<button class="ma-btn" id="ma-save-consent">' + MA_T.mkt_save_consents + '</button>' +
+        '<p class="ma-success" id="ma-consent-success">' + MA_T.mkt_consents_success + '</p>' +
+        '<p class="ma-error" id="ma-consent-error">' + MA_T.mkt_error + '</p>' +
+        '<hr style="border:none;border-top:1px solid #e5e5e5;margin:24px 0;">' +
+        '<p style="margin:0 0 8px;font-size:13px;font-weight:600;text-transform:uppercase;color:#888;">' + MA_T.mkt_prefs + '</p>' +
+        '<div class="ma-checkbox-group">' +
+          CHOICES.map(function (ch) {
+            return '<label class="ma-checkbox-label">' +
+              '<input type="checkbox" name="marketing" value="' + ch + '"' + (currentPrefs.indexOf(ch) !== -1 ? ' checked' : '') + '>' +
+              ch +
+            '</label>';
+          }).join('') +
+        '</div>' +
+        '<button class="ma-btn" id="ma-save-marketing">' + MA_T.mkt_save_prefs + '</button>' +
+        '<p class="ma-success" id="ma-mkt-success">' + MA_T.mkt_prefs_success + '</p>' +
+        '<p class="ma-error" id="ma-mkt-error">' + MA_T.mkt_error + '</p>' +
+      '</div>' +
+
+      '<div class="ma-panel" id="ma-orders">' + renderOrders(orders) + '</div>' +
+      (settings.metafields && settings.metafields.wishlist && settings.metafields.wishlist.enabled
+        ? '<div class="ma-panel" id="ma-wishlist"><p style="color:#888;font-size:14px;">' + MA_T.wl_loading + '</p></div>'
+        : '');
+
+    // Tab switching
+    var wishlistLoaded = false;
+    function switchTab(name) {
+      el.querySelectorAll('.ma-tab').forEach(function (t) { t.classList.remove('active'); });
+      el.querySelectorAll('.ma-panel').forEach(function (p) { p.classList.remove('active'); });
+      var btn = el.querySelector('[data-tab="' + name + '"]');
+      if (btn) btn.classList.add('active');
+      var panel = document.getElementById('ma-' + name);
+      if (panel) panel.classList.add('active');
+      var url = new URL(location.href);
+      url.searchParams.set('tab', name);
+      history.replaceState(null, '', url.toString());
+      if (name === 'wishlist' && !wishlistLoaded) {
+        wishlistLoaded = true;
+        fetchJson(PROXY + '?action=wishlist&customerId=' + encodeURIComponent(customerId))
+          .then(function (data) {
+            var products = data.products || [];
+            var wlPanel = document.getElementById('ma-wishlist');
+            if (!wlPanel) return;
+            if (products.length === 0) {
+              wlPanel.innerHTML = '<p style="color:#888;font-size:14px;">' + MA_T.wl_empty + '</p>';
+              return;
+            }
+            wlPanel.innerHTML = '<div class="ma-wl-grid">' +
+              products.map(function (p) {
+                var price = p.priceRange && p.priceRange.minVariantPrice
+                  ? formatCurrency(parseFloat(p.priceRange.minVariantPrice.amount), p.priceRange.minVariantPrice.currencyCode)
+                  : '';
+                var img = p.featuredImage ? '<img src="' + p.featuredImage.url + '" alt="' + (p.featuredImage.altText || p.title) + '">' : '';
+                return '<a href="' + (p.onlineStoreUrl || '#') + '" class="ma-wl-card">' +
+                  img +
+                  '<div class="ma-wl-card-body">' +
+                    '<p class="ma-wl-card-title">' + p.title + '</p>' +
+                    (price ? '<p class="ma-wl-card-price">' + price + '</p>' : '') +
+                  '</div>' +
+                '</a>';
+              }).join('') +
+            '</div>';
+          })
+          .catch(function () {
+            var wlPanel = document.getElementById('ma-wishlist');
+            if (wlPanel) wlPanel.innerHTML = '<p style="color:var(--ma-error);font-size:14px;">' + MA_T.wl_error + '</p>';
+          });
+      }
+    }
+
+    el.querySelectorAll('.ma-tab').forEach(function (tab) {
+      tab.addEventListener('click', function () { switchTab(tab.dataset.tab); });
+    });
+
+    var urlTab = new URL(location.href).searchParams.get('tab');
+    if (urlTab && ['profile','addresses','marketing','orders'].indexOf(urlTab) !== -1) {
+      switchTab(urlTab);
+    }
+
+    // Save profile
+    document.getElementById('ma-save-profile').addEventListener('click', async function () {
+      const successEl = document.getElementById('ma-profile-success');
+      const errorEl = document.getElementById('ma-profile-error');
+      successEl.style.display = 'none';
+      errorEl.style.display = 'none';
+      try {
+        await postJson('update-profile', {
+          firstName: document.getElementById('ma-firstName').value,
+          lastName: document.getElementById('ma-lastName').value,
+          phone: document.getElementById('ma-phone').value || null,
+          birthDate: document.getElementById('ma-birthdate').value || null,
+        });
+        successEl.style.display = 'block';
+        setTimeout(function () { successEl.style.display = 'none'; }, 3000);
+      } catch (err) {
+        errorEl.style.display = 'block';
+      }
+    });
+
+    // Toggle address form
+    document.getElementById('ma-toggle-form').addEventListener('click', function () {
+      const form = document.getElementById('ma-address-form');
+      form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    });
+
+    // Submit new address
+    document.getElementById('ma-new-address').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const f = e.target;
+      const successEl = document.getElementById('ma-addr-success');
+      const errorEl = document.getElementById('ma-addr-error');
+      successEl.style.display = 'none';
+      errorEl.style.display = 'none';
+      try {
+        await postJson('create-address', {
+          address: {
+            firstName: f.firstName.value || undefined,
+            lastName: f.lastName.value || undefined,
+            address1: f.address1.value,
+            address2: f.address2.value || undefined,
+            city: f.city.value,
+            province: f.province.value || undefined,
+            zip: f.zip.value,
+            country: f.country.value,
+            phone: f.phone.value || undefined,
+          },
+        });
+        successEl.style.display = 'block';
+        f.reset();
+        document.getElementById('ma-address-form').style.display = 'none';
+        setTimeout(function () { location.reload(); }, 1200);
+      } catch (err) {
+        errorEl.style.display = 'block';
+      }
+    });
+
+    // Set default address
+    el.querySelectorAll('.ma-set-default').forEach(function (btn) {
+      btn.addEventListener('click', async function () {
+        const card = btn.closest('.ma-address-card');
+        const successEl = card.querySelector('.ma-default-success');
+        const errorEl = card.querySelector('.ma-default-error');
+        successEl.style.display = 'none';
+        errorEl.style.display = 'none';
+        btn.disabled = true;
+        try {
+          await postJson('set-default-address', { addressId: btn.dataset.addressId });
+          successEl.style.display = 'block';
+          setTimeout(function () { location.reload(); }, 1000);
+        } catch (err) {
+          errorEl.style.display = 'block';
+          btn.disabled = false;
+        }
+      });
+    });
+
+    // Delete address
+    el.querySelectorAll('.ma-delete-address').forEach(function (btn) {
+      btn.addEventListener('click', async function () {
+        if (!confirm(MA_T.addr_delete_confirm)) return;
+        var card = btn.closest('.ma-address-card');
+        btn.disabled = true;
+        try {
+          await postJson('delete-address', { addressId: btn.dataset.addressId });
+          card.style.transition = 'opacity .3s';
+          card.style.opacity = '0';
+          setTimeout(function () { card.remove(); }, 300);
+        } catch (err) {
+          btn.disabled = false;
+          var errorEl = card.querySelector('.ma-default-error');
+          if (errorEl) { errorEl.textContent = MA_T.addr_delete_error; errorEl.style.display = 'block'; }
+        }
+      });
+    });
+
+    // Order detail
+    el.addEventListener('click', async function (e) {
+      var btn = e.target.closest('.ma-order-detail-btn');
+      if (!btn) return;
+      var orderId = btn.dataset.orderId;
+      var listEl = document.getElementById('ma-orders-list');
+      var detailEl = document.getElementById('ma-orders-detail');
+      detailEl.innerHTML = '<p style="color:#888;font-size:14px;padding:16px 0;">' + MA_T.orders_loading + '</p>';
+      listEl.style.display = 'none';
+      detailEl.style.display = 'block';
+      try {
+        var data = await fetchJson(PROXY + '?action=order&customerId=' + encodeURIComponent(customerId) + '&orderId=' + encodeURIComponent(orderId));
+        detailEl.innerHTML = renderOrderDetail(data.order);
+        document.getElementById('ma-back-to-orders').addEventListener('click', function () {
+          detailEl.style.display = 'none';
+          detailEl.innerHTML = '';
+          listEl.style.display = 'block';
+        });
+      } catch (err) {
+        detailEl.innerHTML = '<p style="color:#c0392b;font-size:14px;">' + MA_T.orders_error + '</p>';
+      }
+    });
+
+    // Save consent
+    document.getElementById('ma-save-consent').addEventListener('click', async function () {
+      const successEl = document.getElementById('ma-consent-success');
+      const errorEl = document.getElementById('ma-consent-error');
+      successEl.style.display = 'none';
+      errorEl.style.display = 'none';
+      try {
+        const smsEl = document.getElementById('ma-sms-consent');
+        await postJson('update-consent', {
+          emailSubscribed: document.getElementById('ma-email-consent').checked,
+          smsSubscribed: smsEl ? smsEl.checked : false,
+          phone: smsEl ? (c.phone || null) : null,
+        });
+        successEl.style.display = 'block';
+        setTimeout(function () { successEl.style.display = 'none'; }, 3000);
+      } catch (err) {
+        errorEl.style.display = 'block';
+      }
+    });
+
+    // Save marketing preferences
+    document.getElementById('ma-save-marketing').addEventListener('click', async function () {
+      const successEl = document.getElementById('ma-mkt-success');
+      const errorEl = document.getElementById('ma-mkt-error');
+      successEl.style.display = 'none';
+      errorEl.style.display = 'none';
+      const values = Array.from(el.querySelectorAll('input[name="marketing"]:checked')).map(function (i) { return i.value; });
+      try {
+        await postJson('update-metafield', { values, email: customerEmail });
+        successEl.style.display = 'block';
+        setTimeout(function () { successEl.style.display = 'none'; }, 3000);
+      } catch (err) {
+        errorEl.style.display = 'block';
+      }
+    });
+  }
+
+  function normalizeAddressId(id) {
+    if (!id) return '';
+    return id.split('?')[0].split('/').pop();
+  }
+
+  function renderAddressCard(a, isDefault) {
+    var name = [a.firstName, a.lastName].filter(Boolean).join(' ');
+    return '<div class="ma-address-card' + (isDefault ? ' ma-addr-default-card' : '') + '" data-address-id="' + a.id + '">' +
+      (name ? '<p><strong>' + name + '</strong></p>' : '') +
+      '<p>' + a.address1 + (a.address2 ? ', ' + a.address2 : '') + '</p>' +
+      '<p>' + a.zip + ' ' + a.city + (a.province ? ' (' + a.province + ')' : '') + ' — ' + a.country + '</p>' +
+      (a.phone ? '<p>' + a.phone + '</p>' : '') +
+      '<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">' +
+        (isDefault
+          ? '<span style="font-size:12px;color:var(--ma-primary);font-weight:600;">' + MA_T.addr_is_default + '</span>'
+          : '<button class="ma-btn ma-btn-outline ma-set-default" style="margin-top:0;font-size:12px;padding:6px 12px;" data-address-id="' + a.id + '">' + MA_T.addr_set_default + '</button>' +
+            '<button class="ma-btn ma-btn-danger ma-delete-address" data-address-id="' + a.id + '">' + MA_T.addr_delete + '</button>') +
+        '<p class="ma-success ma-default-success" style="display:none;font-size:12px;margin:4px 0 0;width:100%;">' + MA_T.addr_default_success + '</p>' +
+        '<p class="ma-error ma-default-error" style="display:none;font-size:12px;margin:4px 0 0;width:100%;">' + MA_T.addr_default_error + '</p>' +
+      '</div>' +
+    '</div>';
+  }
+
+  function renderAddresses(addresses, defaultAddressId) {
+    if (!addresses || addresses.length === 0) return '<p style="color:#888;font-size:14px;margin-bottom:12px;">' + MA_T.addr_empty + '</p>';
+    var defaultNumeric = normalizeAddressId(defaultAddressId);
+    var defaultAddr = addresses.find(function(a) { return normalizeAddressId(a.id) === defaultNumeric; });
+    var others = addresses.filter(function(a) { return normalizeAddressId(a.id) !== defaultNumeric; });
+    var leftCol = '<div>' +
+      '<p class="ma-addr-col-label">' + MA_T.addr_is_default + '</p>' +
+      (defaultAddr ? renderAddressCard(defaultAddr, true) : '<p style="color:#888;font-size:14px;">' + MA_T.addr_empty + '</p>') +
+    '</div>';
+    var rightCol = '<div>' +
+      (others.length ? '<p class="ma-addr-col-label">' + MA_T.addr_other + '</p>' : '') +
+      others.map(function(a) { return renderAddressCard(a, false); }).join('') +
+    '</div>';
+    return '<div class="ma-addr-grid">' + leftCol + rightCol + '</div>';
+  }
+
+  function renderLoyaltyProgress(orders, loyalty) {
+    var max = (loyalty && loyalty.targetOrders) ? parseInt(loyalty.targetOrders, 10) : 10;
+    var promoCode = (loyalty && loyalty.promoCode) ? loyalty.promoCode : 'LOYAL10';
+    var count = Math.min(orders ? orders.length : 0, max);
+    var circumference = 282.7;
+    var offset = circumference * (1 - count / max);
+    var unlocked = count >= max;
+    var arcClass = 'ma-progress-arc' + (unlocked ? ' ma-arc-unlocked' : '');
+    var countClass = 'ma-loyalty-count' + (unlocked ? ' ma-arc-unlocked' : '');
+    var remaining = max - count;
+    var remainingText = MA_T.loyalty_progress_remaining
+      .replace('{n}', remaining)
+      .replace('{unit}', remaining === 1 ? MA_T.loyalty_order_one : MA_T.loyalty_order_other);
+
+    return '<div class="ma-loyalty-box">' +
+      '<p style="margin:0 0 14px;font-size:12px;font-weight:600;text-transform:uppercase;color:#888;">' + MA_T.loyalty_heading + '</p>' +
+      '<div style="display:flex;align-items:center;gap:24px;">' +
+        '<div style="position:relative;width:110px;height:110px;flex-shrink:0;">' +
+          '<svg width="110" height="110" viewBox="0 0 110 110" style="transform:rotate(-90deg);">' +
+            '<circle cx="55" cy="55" r="45" fill="none" stroke="#f0f0f0" stroke-width="9"/>' +
+            '<circle class="' + arcClass + '" cx="55" cy="55" r="45" fill="none" stroke-width="9" stroke-linecap="round" stroke-dasharray="' + circumference + '" stroke-dashoffset="' + offset.toFixed(1) + '"/>' +
+          '</svg>' +
+          '<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;line-height:1;">' +
+            '<div class="' + countClass + '" style="font-size:24px;font-weight:700;">' + count + '</div>' +
+            '<div style="font-size:12px;color:#888;margin-top:2px;">' + (unlocked ? '✓' : '/ ' + max) + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div style="flex:1;">' +
+          (unlocked
+            ? '<p class="ma-loyalty-count ma-arc-unlocked" style="font-size:14px;font-weight:700;margin:0 0 6px;">' + MA_T.loyalty_unlocked_title + '</p>' +
+              '<p style="font-size:13px;color:#555;margin:0 0 10px;">' + MA_T.loyalty_unlocked_desc + '</p>' +
+              '<div class="ma-loyalty-unlocked-box">' +
+                '<div class="ma-loyalty-unlocked-code">' + promoCode + '</div>' +
+                '<div style="font-size:11px;color:#555;margin-top:3px;">' + MA_T.loyalty_unlocked_footnote + '</div>' +
+              '</div>'
+            : '<p style="font-size:14px;font-weight:700;margin:0 0 6px;">' + MA_T.loyalty_progress_title + '</p>' +
+              '<p style="font-size:13px;color:#555;margin:0;"><strong>' + remainingText + '</strong></p>' +
+              '<p style="font-size:13px;color:#555;margin:4px 0 0;">' + MA_T.loyalty_progress_footnote + '</p>'
+          ) +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }
+
+  function formatDate(dateStr) {
+    return new Date(dateStr).toLocaleDateString('{{ request.locale.iso_code }}', { day: '2-digit', month: 'long', year: 'numeric' });
+  }
+
+  function formatCurrency(amount, currency) {
+    return parseFloat(amount).toLocaleString('{{ request.locale.iso_code }}', { style: 'currency', currency: currency || 'EUR' });
+  }
+
+  function statusBadge(status) {
+    if (!status) return '';
+    var colorMap = {
+      PAID: 'green', FULFILLED: 'green', DELIVERED: 'green',
+      PENDING: 'gray', UNFULFILLED: 'gray', NOT_STARTED: 'gray',
+      PARTIALLY_FULFILLED: 'orange', IN_TRANSIT: 'orange', OUT_FOR_DELIVERY: 'orange', PARTIALLY_REFUNDED: 'orange',
+      REFUNDED: 'blue', VOIDED: 'blue'
+    };
+    var color = colorMap[status.toUpperCase()] || 'gray';
+    return '<span class="ma-status-badge ma-status-' + color + '">' + status + '</span>';
+  }
+
+  function renderOrders(orders) {
+    if (!orders || orders.length === 0) {
+      return '<div id="ma-orders-list"><p style="color:#888;font-size:14px;">' + MA_T.orders_empty + '</p></div><div id="ma-orders-detail" style="display:none;"></div>';
+    }
+    return '<div id="ma-orders-list">' +
+      orders.map(function (o) {
+        var total = o.totalPriceSet && o.totalPriceSet.shopMoney;
+        return '<div class="ma-order-row">' +
+          '<div>' +
+            '<div class="ma-order-name">' + o.name + '</div>' +
+            '<div class="ma-order-date">' + formatDate(o.processedAt) + '</div>' +
+            '<div style="margin-top:6px;">' + statusBadge(o.displayFinancialStatus) + ' ' + statusBadge(o.displayFulfillmentStatus) + '</div>' +
+          '</div>' +
+          '<div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">' +
+            '<span style="font-size:14px;font-weight:600;">' + (total ? formatCurrency(total.amount, total.currencyCode) : '—') + '</span>' +
+            '<button class="ma-btn ma-btn-outline ma-order-detail-btn" style="font-size:12px;padding:6px 12px;margin-top:0;" data-order-id="' + o.id + '">' + MA_T.orders_detail + '</button>' +
+          '</div>' +
+        '</div>';
+      }).join('') +
+    '</div>' +
+    '<div id="ma-orders-detail" style="display:none;"></div>';
+  }
+
+  function renderOrderDetail(order) {
+    var total = order.totalPriceSet && order.totalPriceSet.shopMoney;
+    var subtotal = order.subtotalPriceSet && order.subtotalPriceSet.shopMoney;
+    var shipping = order.totalShippingPriceSet && order.totalShippingPriceSet.shopMoney;
+    var trackingLinks = [];
+    (order.fulfillments || []).forEach(function (f) {
+      (f.trackingInfo || []).forEach(function (t) { if (t.number) trackingLinks.push(t); });
+    });
+
+    return '<button id="ma-back-to-orders" class="ma-btn ma-btn-outline" style="font-size:12px;padding:6px 12px;margin-bottom:16px;">' + MA_T.orders_back + '</button>' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:16px;">' +
+        '<div>' +
+          '<div style="font-size:18px;font-weight:700;">' + order.name + '</div>' +
+          '<div style="font-size:13px;color:#888;margin-top:2px;">' + formatDate(order.processedAt) + '</div>' +
+          '<div style="margin-top:6px;">' + statusBadge(order.displayFinancialStatus) + ' ' + statusBadge(order.displayFulfillmentStatus) + '</div>' +
+        '</div>' +
+        (total ? '<div style="font-size:20px;font-weight:700;">' + formatCurrency(total.amount, total.currencyCode) + '</div>' : '') +
+      '</div>' +
+      (trackingLinks.length > 0 ?
+        '<div style="background:#f5f5f5;border-radius:6px;padding:10px 14px;margin-bottom:16px;">' +
+          '<p style="margin:0 0 6px;font-size:12px;font-weight:600;color:#888;text-transform:uppercase;">' + MA_T.orders_tracking + '</p>' +
+          trackingLinks.map(function (t) {
+            return t.url
+              ? '<a href="' + t.url + '" target="_blank" style="font-size:13px;color:#111;display:block;">' + t.number + '</a>'
+              : '<span style="font-size:13px;display:block;">' + t.number + '</span>';
+          }).join('') +
+        '</div>'
+      : '') +
+      '<p style="margin:0 0 8px;font-size:12px;font-weight:600;color:#888;text-transform:uppercase;">' + MA_T.orders_products + '</p>' +
+      '<div style="border:1px solid #e5e5e5;border-radius:6px;padding:0 16px;margin-bottom:16px;">' +
+        ((order.lineItems && order.lineItems.nodes) || []).map(function (item) {
+          var img = item.image && item.image.url;
+          var itemTotal = item.originalTotalSet && item.originalTotalSet.shopMoney;
+          return '<div class="ma-line-item">' +
+            (img ? '<img src="' + img + '" alt="' + (item.image.altText || item.title) + '">' : '<div style="width:50px;height:50px;background:#f0f0f0;border-radius:4px;flex-shrink:0;"></div>') +
+            '<div class="ma-line-item-info">' +
+              '<div class="ma-line-item-title">' + item.title + '</div>' +
+              '<div class="ma-line-item-qty">' + MA_T.orders_qty + ' ' + item.quantity + '</div>' +
+            '</div>' +
+            '<div class="ma-line-item-price">' + (itemTotal ? formatCurrency(itemTotal.amount, itemTotal.currencyCode) : '—') + '</div>' +
+          '</div>';
+        }).join('') +
+      '</div>' +
+      '<div style="border-top:1px solid #e5e5e5;padding-top:12px;margin-bottom:16px;">' +
+        (subtotal ? '<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;"><span>' + MA_T.orders_subtotal + '</span><span>' + formatCurrency(subtotal.amount, subtotal.currencyCode) + '</span></div>' : '') +
+        (shipping ? '<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;"><span>' + MA_T.orders_shipping + '</span><span>' + formatCurrency(shipping.amount, shipping.currencyCode) + '</span></div>' : '') +
+        (total ? '<div style="display:flex;justify-content:space-between;font-size:15px;font-weight:700;margin-top:4px;"><span>' + MA_T.orders_total + '</span><span>' + formatCurrency(total.amount, total.currencyCode) + '</span></div>' : '') +
+      '</div>' +
+      (order.shippingAddress ?
+        '<p style="margin:0 0 6px;font-size:12px;font-weight:600;color:#888;text-transform:uppercase;">' + MA_T.orders_shipping_addr + '</p>' +
+        '<div style="font-size:13px;color:#555;line-height:1.8;">' +
+          order.shippingAddress.address1 +
+          (order.shippingAddress.address2 ? ', ' + order.shippingAddress.address2 : '') + '<br>' +
+          order.shippingAddress.zip + ' ' + order.shippingAddress.city + ' — ' + order.shippingAddress.country +
+        '</div>'
+      : '');
+  }
+
+  function renderAddressForm() {
+    return '<form id="ma-new-address" class="ma-form">' +
+      '<div class="ma-form-row">' +
+        '<input name="firstName" placeholder="' + MA_T.addr_form_first_name + '">' +
+        '<input name="lastName" placeholder="' + MA_T.addr_form_last_name + '">' +
+      '</div>' +
+      '<input name="address1" placeholder="' + MA_T.addr_form_address1 + '" required>' +
+      '<input name="address2" placeholder="' + MA_T.addr_form_address2 + '">' +
+      '<div class="ma-form-row">' +
+        '<input name="zip" placeholder="' + MA_T.addr_form_zip + '" required>' +
+        '<input name="city" placeholder="' + MA_T.addr_form_city + '" required>' +
+      '</div>' +
+      '<div class="ma-form-row">' +
+        '<input name="province" placeholder="' + MA_T.addr_form_province + '">' +
+        '<input name="country" placeholder="' + MA_T.addr_form_country + '" value="Italy" required>' +
+      '</div>' +
+      '<input name="phone" placeholder="' + MA_T.addr_form_phone + '">' +
+      '<button type="submit" class="ma-btn">' + MA_T.addr_form_save + '</button>' +
+    '</form>';
+  }
+})();
+</script>
+{% endif %}
+
+{% schema %}
+{
+  "name": "My Account",
+  "target": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Tipografia"
+    },
+    {
+      "type": "font_picker",
+      "id": "body_font",
+      "label": "Font",
+      "default": "assistant_n4"
+    },
+    {
+      "type": "header",
+      "content": "Colori"
+    },
+    {
+      "type": "color",
+      "id": "color_primary",
+      "label": "Colore principale",
+      "info": "Bottoni, tab attivo, bordi focus",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "color_accent",
+      "label": "Colore accento",
+      "info": "Messaggi di successo, fedeltà sbloccata",
+      "default": "#2a7a2a"
+    },
+    {
+      "type": "color",
+      "id": "color_error",
+      "label": "Colore errore",
+      "default": "#c0392b"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Larghezza piena",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "content_width",
+      "label": "Larghezza contenuto",
+      "min": 400,
+      "max": 1400,
+      "step": 10,
+      "unit": "px",
+      "default": 700
+    },
+    {
+      "type": "header",
+      "content": "Forma"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "Border radius",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "default": 6
+    }
+  ]
+}
+{% endschema %}
