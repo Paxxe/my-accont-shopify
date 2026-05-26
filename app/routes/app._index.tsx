@@ -4,11 +4,11 @@ import { useLoaderData, useFetcher } from "react-router";
 import { useAppBridge } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
 import { boundary } from "@shopify/shopify-app-react-router/server";
-import { getSettings, saveSettings, type AppSettings } from "../services/settings.server";
+import { getSettings, saveSettings, DEFAULT_SETTINGS, type AppSettings } from "../services/settings.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { session } = await authenticate.admin(request);
-  const settings = await getSettings(session.shop);
+  const settings = await getSettings(session.shop).catch(() => DEFAULT_SETTINGS);
   return { settings };
 };
 
