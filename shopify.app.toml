@@ -2,7 +2,7 @@
 
 client_id = "8795aab80f9b1cf48d0368ce283b754a"
 name = "Test-my-account"
-application_url = "https://ipaq-dual-estimated-numerous.trycloudflare.com"
+application_url = "https://my-accont-shopify.vercel.app"
 embedded = true
 
 [build]
@@ -24,10 +24,10 @@ api_version = "2026-04"
 scopes = "write_metaobject_definitions,write_metaobjects,write_products,read_customers,write_customers,read_orders"
 
 [auth]
-redirect_urls = [ "https://ipaq-dual-estimated-numerous.trycloudflare.com/auth/callback" ]
+redirect_urls = [ "https://my-accont-shopify.vercel.app/auth/callback" ]
 
 [app_proxy]
-url = "https://ipaq-dual-estimated-numerous.trycloudflare.com"
+url = "https://my-accont-shopify.vercel.app"
 subpath = "my-account"
 prefix = "apps"
 
