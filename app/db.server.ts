@@ -5,12 +5,21 @@ declare global {
   var prismaGlobal: PrismaClient;
 }
 
+function buildPrisma() {
+  const base = process.env.DATABASE_URL ?? "";
+  const url = base.includes("pgbouncer=true")
+    ? base
+    : base + (base.includes("?") ? "&" : "?") + "pgbouncer=true";
+  const client = new PrismaClient({ datasources: { db: { url } } });
+  client.$connect().catch(() => {});
+  return client;
+}
+
 let prisma: PrismaClient;
 if (globalThis.prismaGlobal) {
   prisma = globalThis.prismaGlobal;
 } else {
-  prisma = new PrismaClient();
-  prisma.$connect().catch(() => {});
+  prisma = buildPrisma();
   globalThis.prismaGlobal = prisma;
 }
 
