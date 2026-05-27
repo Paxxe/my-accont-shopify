@@ -22,9 +22,7 @@ const shopify = shopifyApp({
     (s as any).ready = Promise.resolve(true);
     return s;
   })(),
-  future: {
-    expiringOfflineAccessTokens: true,
-  },
+  future: {},
   ...(process.env.SHOP_CUSTOM_DOMAIN
     ? { customShopDomains: [process.env.SHOP_CUSTOM_DOMAIN] }
     : {}),
