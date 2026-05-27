@@ -14,8 +14,9 @@ export async function loader() {
   }
 
   try {
-    const count = await prisma.session.count();
-    results.sessionTable = `ok (${count} rows)`;
+    const sessions = await prisma.session.findMany({ select: { id: true, shop: true, isOnline: true } });
+    results.sessionTable = `ok (${sessions.length} rows)`;
+    results.sessions = sessions;
   } catch (e: any) {
     results.sessionTable = e.message;
   }
