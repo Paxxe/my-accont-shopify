@@ -4,10 +4,28 @@ export async function loader() {
   const dbUrl = process.env.DATABASE_URL ?? "NOT SET";
   const safeUrl = dbUrl.replace(/:[^:@]+@/, ":***@");
 
+  const results: Record<string, any> = { db: safeUrl };
+
   try {
     await prisma.$queryRaw`SELECT 1`;
-    return Response.json({ ok: true, db: safeUrl, connected: true });
+    results.ping = "ok";
   } catch (e: any) {
-    return Response.json({ ok: false, db: safeUrl, connected: false, error: e.message });
+    results.ping = e.message;
   }
+
+  try {
+    const count = await prisma.session.count();
+    results.sessionTable = `ok (${count} rows)`;
+  } catch (e: any) {
+    results.sessionTable = e.message;
+  }
+
+  try {
+    const count = await prisma.appSettings.count();
+    results.appSettingsTable = `ok (${count} rows)`;
+  } catch (e: any) {
+    results.appSettingsTable = e.message;
+  }
+
+  return Response.json(results);
 }
