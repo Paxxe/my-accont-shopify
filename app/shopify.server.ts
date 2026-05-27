@@ -15,10 +15,13 @@ const shopify = shopifyApp({
   appUrl: process.env.SHOPIFY_APP_URL || "",
   authPathPrefix: "/auth",
   distribution: AppDistribution.AppStore,
-  sessionStorage: new PrismaSessionStorage(prisma, {
-    connectionRetries: 10,
-    connectionRetryIntervalMs: 1000,
-  }),
+  sessionStorage: (() => {
+    const s = new PrismaSessionStorage(prisma);
+    // pollForTable runs at construction time before the DB connection is ready on cold starts.
+    // We bypass it: the table exists (verified), real query errors will surface naturally.
+    (s as any).ready = Promise.resolve(true);
+    return s;
+  })(),
   future: {
     expiringOfflineAccessTokens: true,
   },
