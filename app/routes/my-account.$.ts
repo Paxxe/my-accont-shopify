@@ -15,6 +15,8 @@ function normalizeCustomerId(id: string): string {
 }
 
 export async function loader({ request }: { request: Request }) {
+  console.log("[PROXY DEBUG] URL:", request.url);
+  console.log("[PROXY DEBUG] Headers:", JSON.stringify(Object.fromEntries(request.headers.entries())));
   const { admin, session } = await authenticate.public.appProxy(request);
 
   const url = new URL(request.url);
