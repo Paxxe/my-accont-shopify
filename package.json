@@ -2,7 +2,8 @@
   "name": "test-my-account",
   "private": true,
   "scripts": {
-    "build": "prisma generate && react-router build",
+    "build": "react-router build",
+    "postinstall": "prisma generate",
     "dev": "shopify app dev",
     "config:link": "shopify app config link",
     "generate": "shopify app generate",
