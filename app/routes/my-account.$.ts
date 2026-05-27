@@ -15,11 +15,16 @@ function normalizeCustomerId(id: string): string {
 }
 
 export async function loader({ request }: { request: Request }) {
+  const url = new URL(request.url);
   console.log("[PROXY DEBUG] URL:", request.url);
   console.log("[PROXY DEBUG] Headers:", JSON.stringify(Object.fromEntries(request.headers.entries())));
+
+  if (url.searchParams.get("action") === "ping") {
+    return Response.json({ pong: true, receivedUrl: request.url });
+  }
+
   const { admin, session } = await authenticate.public.appProxy(request);
 
-  const url = new URL(request.url);
   const action = url.searchParams.get("action");
   const customerIdRaw = url.searchParams.get("customerId");
 
