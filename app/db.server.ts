@@ -5,7 +5,13 @@ declare global {
   var prismaGlobal: PrismaClient;
 }
 
-const prisma = globalThis.prismaGlobal ?? new PrismaClient();
-globalThis.prismaGlobal = prisma;
+let prisma: PrismaClient;
+if (globalThis.prismaGlobal) {
+  prisma = globalThis.prismaGlobal;
+} else {
+  prisma = new PrismaClient();
+  prisma.$connect().catch(() => {});
+  globalThis.prismaGlobal = prisma;
+}
 
 export default prisma;
